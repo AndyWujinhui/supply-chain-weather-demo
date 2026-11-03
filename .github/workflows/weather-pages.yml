@@ -1,0 +1,77 @@
+name: Publish weather source and notify IndexNow
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weather-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/configure-pages@v5
+      - name: Prepare weather-only static site
+        env:
+          INDEXNOW_KEY: ${{ secrets.WEATHERSITE_INDEXNOW_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os, pathlib, re, shutil
+          key = os.environ["INDEXNOW_KEY"]
+          if not re.fullmatch(r"[a-f0-9]{32}", key):
+              raise ValueError("Missing or invalid protected IndexNow key")
+          destination = pathlib.Path("_site")
+          destination.mkdir()
+          for name in ("index.html", "feed.json"):
+              shutil.copyfile(name, destination / name)
+          (destination / (key + ".txt")).write_text(key, encoding="utf-8")
+          PY
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
+      - name: Notify Bing; acceptance does not prove indexing
+        env:
+          INDEXNOW_KEY: ${{ secrets.WEATHERSITE_INDEXNOW_KEY }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          key = os.environ["INDEXNOW_KEY"]
+          root = "https://andywujinhui.github.io/supply-chain-weather-demo/"
+          payload = {"host": "andywujinhui.github.io", "key": key,
+                     "keyLocation": root + key + ".txt",
+                     "urlList": [root, root + "index.html", root + "feed.json"]}
+          request = urllib.request.Request(
+              "https://www.bing.com/indexnow",
+              data=json.dumps(payload).encode("utf-8"),
+              headers={"Content-Type": "application/json; charset=utf-8"},
+              method="POST")
+          with urllib.request.urlopen(request, timeout=60) as response:
+              status = response.status
+              if status not in (200, 202):
+                  raise RuntimeError("Unexpected IndexNow HTTP status: " + str(status))
+          print("IndexNow notification received: HTTP " + str(status))
+          print("Search indexing and native Cowork ingestion remain unverified.")
+          PY
