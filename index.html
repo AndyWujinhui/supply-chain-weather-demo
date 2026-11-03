@@ -56,7 +56,9 @@
     .studio-secondary{display:flex;flex-direction:column;justify-content:center}.studio-secondary p{padding:0 16px;font-size:12px;color:#a6c1d1}
     .map-label{position:absolute;top:14px;left:16px;padding:4px 8px;background:#071620d9;border:1px solid #385366;border-radius:5px;font-size:11px;pointer-events:none}
     .map-label b{color:#71dfef;margin-right:8px}.studio-timeline input{flex:1;min-width:80px;accent-color:#36c9df}.studio-timeline time{min-width:116px;font-size:12px;color:#b8d2df}.studio-disclaimer{padding:8px 20px;margin:0;font-size:11px;color:#aac0cd}
-    @media(max-width:850px){.studio-panes{grid-template-columns:1fr}.studio-secondary{display:none}.studio-toolbar{align-items:flex-start;flex-direction:column}}
+    .studio-secondary canvas{border-bottom:1px solid #26465a}.secondary-map{position:relative}
+    @media(max-width:850px){.studio-panes{grid-template-columns:1fr}.studio-secondary{display:grid;grid-template-columns:1fr 1fr}.studio-secondary p{grid-column:1/-1}.studio-toolbar{align-items:flex-start;flex-direction:column}}
+    @media(max-width:560px){.studio-secondary{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -78,7 +80,7 @@
       <div class="studio-toolbar"><div><h2>沿海天气影像</h2><small>COASTAL WEATHER IMAGERY · SYNTHETIC SCENARIO</small></div><div class="studio-controls"><button data-map-mode="infrared" aria-pressed="true">红外云图</button><button data-map-mode="radar" aria-pressed="false">降雨回波</button><button id="weather-language" aria-label="Switch weather map language">EN / 中</button></div></div>
       <div class="studio-panes">
         <div class="studio-main"><div class="map-label"><b id="weather-layer-label">IR · 红外云图</b><span>合成影像 / SIMULATION</span></div><canvas id="weather-cloud-map" width="900" height="470" role="img" aria-label="动态合成红外云图，包含厦门位置、模拟台风云系和情景路径"></canvas></div>
-        <div class="studio-secondary"><div class="map-label">RADAR · 合成回波</div><canvas id="weather-radar-map" width="340" height="310" role="img" aria-label="动态合成降雨回波图"></canvas><p id="weather-map-explanation">观察云系移动、强回波与沿海风险区域。影像仅为同一虚构事件的动态表达，不是卫星或雷达实测数据。</p></div>
+        <div class="studio-secondary"><div class="secondary-map"><div class="map-label">RADAR · 合成回波</div><canvas id="weather-radar-map" width="340" height="210" role="img" aria-label="动态合成降雨回波图"></canvas></div><div class="secondary-map"><div class="map-label">WIND · 合成风场</div><canvas id="weather-wind-map" width="340" height="210" role="img" aria-label="动态合成风场图，非实测风速"></canvas></div><p id="weather-map-explanation">云系、降雨回波与风场使用同一情景时间轴。全部为合成演示，不是卫星、雷达或风速实测。</p></div>
       </div>
       <div class="studio-timeline"><button id="weather-play" aria-pressed="true">暂停回放</button><input id="weather-frame" type="range" min="0" max="35" value="0" aria-label="天气影像情景时间轴"><time id="weather-frame-time">情景 08:00</time></div>
       <p class="studio-disclaimer">合成云图、降雨回波和示意路径均非官方观测或预报；时间轴回放不改变已发布风险公告。</p><p id="weather-visual-error" class="error" role="alert" hidden></p>
@@ -176,7 +178,7 @@
     }
   </script>
   <script type="module">
-    import('./weather-visuals.mjs?v=20261103-clouds').catch(error => {
+    import('./weather-visuals.mjs?v=20261103-wind').catch(error => {
       const notice = document.getElementById('weather-visual-error');
       notice.hidden = false;
       notice.textContent = `天气影像未就绪：${error.message}`;
