@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="完全虚构的厦门天气风险演示源，非官方预警，无业务数据、后台或数据库。">
+  <title>Weather Signal Lab | 模拟天气风险源</title>
+  <link rel="alternate" type="application/json" href="feed.json" title="当前已发布的模拟天气事件">
+  <style>
+    :root{color-scheme:light;--ink:#102c3d;--muted:#5e7382;--line:#dde7ed;--teal:#007f86;--bg:#f3f7fa;--high:#be5a14;--critical:#b72543;--medium:#946300;--none:#14775c}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 "Segoe UI","Microsoft YaHei",sans-serif}
+    a{color:#006d80;text-underline-offset:4px}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}
+    :focus-visible{outline:3px solid #03a7b4;outline-offset:4px} .skip{position:absolute;top:-80px;left:16px;background:white;padding:12px;z-index:8}.skip:focus{top:10px}
+    .top{background:#102c3d;color:#fff}.bar{max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center;padding:22px 30px;gap:20px}
+    .brand{display:flex;align-items:center;gap:12px}.mark{width:38px;height:38px;border-radius:12px;background:#05a7ad;display:grid;place-items:center;font-weight:800;font-size:19px}
+    .brand strong{font-size:17px;letter-spacing:.3px}.brand small{display:block;font-size:11px;letter-spacing:2px;color:#a9c1ce}
+    .top a{color:#c8e5eb;font-size:13px}.demo-chip{border:1px solid #63818e;border-radius:6px;padding:4px 10px;font-size:11px;letter-spacing:1.5px}
+    .notice{background:#fff1ce;border-bottom:1px solid #ecd696;color:#72521b}.notice div{max-width:1200px;margin:auto;padding:12px 30px;font-size:13px}
+    main{max-width:1200px;margin:auto;padding:35px 30px 45px}.eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--teal);text-transform:uppercase}
+    h1{font-size:clamp(28px,4vw,40px);letter-spacing:-1px;line-height:1.25;margin:8px 0 14px}h2{font-size:21px;line-height:1.4;margin:8px 0}h3{font-size:15px;margin:0 0 9px}
+    p{margin:8px 0}.muted{color:var(--muted)}.intro{display:flex;justify-content:space-between;align-items:flex-end;gap:25px;margin-bottom:25px}
+    .intro p{max-width:710px}.published{white-space:nowrap;font-size:12px;border:1px solid var(--line);border-radius:8px;padding:10px 14px;background:#fff}
+    .published b{color:var(--teal)}.grid{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(280px,1fr);gap:23px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:0 5px 22px #19364b06;overflow:hidden}.pad{padding:26px}
+    .alert-top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:15px}
+    .signal{display:flex;gap:8px;align-items:center;color:var(--teal);font-size:12px;font-weight:700}.dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+    .risk{border-radius:6px;padding:5px 11px;font-size:12px;font-weight:700;background:#fff0df;color:var(--high);white-space:nowrap}
+    .risk[data-level="Critical"]{background:#fce5eb;color:var(--critical)}.risk[data-level="Medium"]{background:#fff3d0;color:var(--medium)}.risk[data-level="None"]{background:#e3f3ec;color:var(--none)}
+    .alert-title{font-size:23px;margin:12px 0}.summary{color:var(--muted);margin:13px 0 22px;min-height:70px}
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .metric small{display:block;color:var(--muted);font-size:11px}.metric strong{display:block;font-size:21px;margin-top:3px}.metric span{font-size:11px;color:var(--muted)}
+    table{width:100%;border-collapse:collapse;font-size:12px;margin-top:15px}caption{text-align:left;font-weight:700;padding:6px 0;color:var(--muted)}
+    th,td{padding:10px 0;border-bottom:1px solid #edf2f5;text-align:left;vertical-align:top}th{font-weight:500;color:var(--muted);width:30%;padding-right:16px}td{overflow-wrap:anywhere}
+    .mono{font-family:Consolas,monospace;font-size:11px}.map{background:#e8f3f5;border-radius:10px;position:relative;overflow:hidden;margin:14px 0}
+    .map svg{display:block;width:100%;height:185px}.map small{position:absolute;left:12px;bottom:8px;font-size:10px;color:#537080}
+    .side .card+.card{margin-top:20px}.coordinates{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+    .step{display:flex;align-items:flex-start;gap:12px;margin-top:17px;font-size:12px}.step b{display:grid;place-items:center;flex:none;width:23px;height:23px;border-radius:50%;background:#e2f2f2;color:var(--teal)}
+    .step strong{display:block}.step span{color:var(--muted)}.source-link{display:block;margin-top:17px;border:1px solid #abd4d8;padding:10px;text-align:center;border-radius:8px;text-decoration:none;font-weight:600;font-size:12px}
+    .lab{margin-top:24px}.lab-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.lab-head p{font-size:12px;max-width:650px;color:var(--muted)}
+    .scenarios{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px}.scenario{text-align:left;border:1px solid var(--line);background:#f9fbfc;border-radius:10px;padding:15px}
+    .scenario[aria-pressed="true"]{border-color:var(--teal);box-shadow:inset 0 0 0 1px var(--teal);background:#ebf7f7}.scenario .n{display:block;font-size:10px;letter-spacing:1px;color:var(--muted)}
+    .scenario strong{display:block;font-size:16px;margin:4px 0}.scenario small{display:block;color:var(--muted);font-size:11px}.lab-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:17px;font-size:12px}
+    .reset{background:#fff;border:1px solid var(--line);padding:6px 12px;border-radius:6px;color:var(--ink)}.preview-note{margin:0 0 18px;padding:13px 17px;background:#fff1ce;border:1px solid #e4c77e;border-radius:8px;font-size:12px;color:#72521b}
+    [hidden]{display:none!important}.foot{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:25px;margin-top:25px}
+    .foot a{margin-left:12px}.error{color:#a01936;font-weight:600} .file-note{padding-top:14px;font-size:12px}
+    @media(max-width:850px){.grid{grid-template-columns:1fr}.intro{align-items:flex-start;flex-direction:column}.side{display:grid;grid-template-columns:1fr 1fr;gap:20px}.side .card+.card{margin-top:0}.foot{flex-direction:column;gap:10px}.foot a{margin:0 14px 0 0}}
+    @media(max-width:560px){.bar{padding:17px 18px}.top a{display:none}.notice div{padding:12px 18px}main{padding:26px 18px}.pad{padding:20px}.side{display:block}.side .card+.card{margin-top:20px}.scenarios{grid-template-columns:1fr 1fr}.lab-head{display:block}.lab-footer{align-items:flex-start;flex-direction:column}.metric strong{font-size:18px}.alert-title{font-size:21px}th{width:31%}.demo-chip{font-size:10px}}
+    @media(prefers-reduced-motion:no-preference){button{transition:background .15s,border-color .15s}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">跳到当前天气事件</a>
+  <header class="top">
+    <div class="bar">
+      <div class="brand"><span class="mark" aria-hidden="true">W</span><div><strong>Weather Signal Lab</strong><small>SUPPLY CHAIN RISK / DEMO SOURCE</small></div></div>
+      <div><a href="feed.json">当前源数据 JSON</a> &nbsp; <span class="demo-chip">SIMULATION ONLY</span></div>
+    </div>
+  </header>
+  <aside class="notice" aria-label="模拟免责声明"><div><strong>仅供演示 · 非官方预警</strong>　全部天气事件、情景时间与可信度均为人为设定。请勿据此作出安全、出行或真实业务决策。</div></aside>
+  <main id="main">
+    <section class="intro">
+      <div><div class="eyebrow">Weather intelligence / Scenario clock</div><h1>让天气风险，成为可追溯的输入。</h1><p class="muted">用于 Cowork 读取、地点匹配及风险变化识别的静态模拟源。<br>本站不保存供应商、物料、采购单、库存或客户数据，业务记录仍统一位于 Dataverse。</p></div>
+      <div class="published">当前已发布　<b>新增 · v1</b><br><span class="muted">情景时钟，不是实时天气</span></div>
+    </section>
+    <p id="preview-note" class="preview-note" role="status" hidden><strong>正在本地预览另一版本。</strong> 此操作没有发布源变化；Cowork 及 feed.json 仍读取页顶所示的当前发布版本。真正切换源须在演示主机运行发布命令。</p>
+    <div class="grid">
+      <article class="card pad" id="current-event" data-external-key="SIM-XMN-TYPHOON-20261103" data-revision="1">
+        <div class="alert-top"><div class="signal"><span class="dot"></span>模拟天气公告 / 一条当前事件</div><span id="risk-pill" class="risk" data-level="High">模拟风险：<span data-weather="riskLabel">高</span></span></div>
+        <h2 class="alert-title" data-weather="headline">厦门沿海强风与暴雨风险 · 模拟新增</h2>
+        <p class="muted mono">事件 ID：SIM-XMN-TYPHOON-20261103<br>发布者：Weather Signal Lab / DEMO</p>
+        <p class="summary" data-weather="summary">人为设定模拟风暴 WX-DEMO-01 可能影响厦门沿海交通与工业区正常作业。此为重复排练使用的虚构天气输入，不代表发生了真实台风或停工。</p>
+        <div class="metrics">
+          <div class="metric"><small>影响地点</small><strong>厦门</strong><span>福建 · 沿海地区</span></div>
+          <div class="metric"><small>变化类型</small><strong data-weather="changeLabel">新增</strong><span>同一事件的版本变化</span></div>
+          <div class="metric"><small>模拟可信度</small><strong data-weather="confidencePercent">95%</strong><span>非实测预测可信度</span></div>
+        </div>
+        <table aria-label="当前天气事件结构化字段">
+          <caption>可读取的当前源字段 · HTML 无须执行 JavaScript</caption>
+          <thead><tr><th scope="col">字段</th><th scope="col">当前发布值</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">事件 ID</th><td class="mono">SIM-XMN-TYPHOON-20261103</td></tr>
+            <tr><th scope="row">事件类型</th><td>Typhoon-Simulation</td></tr>
+            <tr><th scope="row">版本 / 变化</th><td><span data-weather="revision">1</span> / <span data-weather="changeType">New</span></td></tr>
+            <tr><th scope="row">模拟发布时间</th><td><time data-weather="publishedDisplay" datetime="2026-11-03T08:00:00+08:00">2026-11-03 08:00 北京时间</time><br><span class="mono" data-weather="publishedUtc">2026-11-03T00:00:00.000Z</span></td></tr>
+            <tr><th scope="row">位置 / 坐标</th><td>中国 · 福建 · 厦门<br><span class="mono">24.4798, 118.0894 · 城市中心示意</span></td></tr>
+            <tr><th scope="row">当前 / 先前等级</th><td><span data-weather="riskLevel">High</span> / <span data-weather="previousRiskLevel">None</span></td></tr>
+            <tr><th scope="row">模拟可信度</th><td><span data-weather="confidence">0.95</span>（人为设定，不是实测预测）</td></tr>
+            <tr><th scope="row">情景风险区间</th><td>2026-11-03 至 <span data-weather="riskEnd">2026-12-03</span></td></tr>
+            <tr><th scope="row">事件状态</th><td data-weather="status">Active</td></tr>
+            <tr><th scope="row">变化指纹</th><td class="mono" data-weather="fingerprint">SIM-XMN-WEATHER-NEW-V1</td></tr>
+            <tr><th scope="row">数据来源</th><td>本站人为生成的天气情景。isSimulation = true；officialSourceUrl = null。未引用任何真实预警。</td></tr>
+          </tbody>
+        </table>
+      </article>
+      <aside class="side">
+        <section class="card pad" aria-label="地点示意">
+          <div class="eyebrow">Location match</div><h2>厦门 · 福建沿海</h2><p class="muted" style="font-size:12px">用城市名称及坐标匹配业务地点；不是实际工厂位置。</p>
+          <div class="map">
+            <svg viewBox="0 0 340 185" role="img" aria-label="厦门位置的抽象沿海示意，不是地理地图">
+              <defs><pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M25 0H0V25" fill="none" stroke="#bddce0" stroke-width=".7"/></pattern></defs>
+              <rect width="340" height="185" fill="#deeff2"/><rect width="340" height="185" fill="url(#grid)"/>
+              <path d="M0 0H218L193 25 207 49 170 72 183 92 149 115 166 145 122 185H0Z" fill="#d0e2dc" stroke="#90b6ae" stroke-width="1.5"/>
+              <path d="M235 38Q178 78 225 123T300 162" fill="none" stroke="#23a2b0" stroke-width="2" stroke-dasharray="5 6"/>
+              <circle cx="177" cy="88" r="29" fill="#12a2a4" opacity=".13"/><circle cx="177" cy="88" r="14" fill="#12a2a4" opacity=".22"/><circle cx="177" cy="88" r="5" fill="#007f86"/>
+              <rect x="193" y="69" width="80" height="29" rx="6" fill="white"/><text x="206" y="88" fill="#102c3d" font-size="12">厦门 / DEMO</text>
+            </svg><small>抽象位置示意 · 非精确地图</small>
+          </div>
+          <div class="coordinates"><span>北纬 24.4798°</span><span>东经 118.0894°</span></div>
+        </section>
+        <section class="card pad">
+          <div class="eyebrow">Native Cowork hand-off</div><h2>源头只提供天气信号。</h2>
+          <div class="step"><b>1</b><div><strong>读取已发布 HTML / JSON</strong><span>确认模拟标记、发布时间、地点及当前版本。</span></div></div>
+          <div class="step"><b>2</b><div><strong>识别变化，而非重复报警</strong><span>按事件 ID 比较发布时间、版本与指纹；相同或更旧版本不产生新风险。</span></div></div>
+          <div class="step"><b>3</b><div><strong>业务分析与审批留在 Dataverse</strong><span>由原生插件读写。天气解除也不能自动恢复交期、发料或批准采购。</span></div></div>
+          <a class="source-link" href="feed.json">打开当前已发布的源 JSON ↗</a>
+          <p id="feed-status" class="file-note muted" role="status">静态源：一条当前事件；无需 JavaScript 即可读取。</p>
+        </section>
+      </aside>
+    </div>
+    <section class="card pad lab" aria-label="排练版本预览">
+      <div class="lab-head"><div><div class="eyebrow">Rehearsal lab</div><h2>四种变化，同一个事件。</h2></div><p>下列按钮<strong>仅改变本浏览器预览</strong>，不会改变对外发布的文件。要让 Cowork 读到新版本，必须重新发布 index.html 与 feed.json 两个静态文件。</p></div>
+      <div class="scenarios">
+        <button class="scenario" data-scenario="new" aria-pressed="false"><span class="n">01 / NEW</span><strong>新增</strong><small>无 → 高 · v1</small></button>
+        <button class="scenario" data-scenario="upgraded" aria-pressed="false"><span class="n">02 / UPGRADED</span><strong>升级</strong><small>高 → 极高 · v2</small></button>
+        <button class="scenario" data-scenario="downgraded" aria-pressed="false"><span class="n">03 / DOWNGRADED</span><strong>降级</strong><small>极高 → 中 · v3</small></button>
+        <button class="scenario" data-scenario="resolved" aria-pressed="false"><span class="n">04 / RESOLVED</span><strong>解除</strong><small>中 → 无 · v4</small></button>
+      </div>
+      <div class="lab-footer"><span>真正发布：<code class="mono" id="publish-command">node publish.mjs new</code><br>命令仅在演示主机执行；发布后需部署两个文件并重新读取源。</span><button id="reset-preview" class="reset">返回已发布版本</button></div>
+      <noscript><p class="file-note">本浏览器未启用 JavaScript，预览按钮不可用；当前已发布天气正文和 JSON 仍可正常读取。</p></noscript>
+    </section>
+    <footer class="foot"><div>WEATHER SIGNAL LAB · DEMO<br>独立的模拟天气源例外；不是 Cowork 原生托管服务。没有业务数据库或自定义后台。</div><div>真实源参考（不是本公告的证据）<br><a href="https://www.nmc.cn/" rel="noreferrer">中央气象台</a><a href="https://www.gdacs.org/" rel="noreferrer">GDACS</a><a href="https://portwatch.imf.org/" rel="noreferrer">IMF PortWatch</a></div></footer>
+  </main>
+  <script id="demo-fixtures" type="application/json">{"publishedScenario":"new","states":{"new":{"externalKey":"SIM-XMN-TYPHOON-20261103","eventType":"Typhoon-Simulation","location":"中国 · 福建 · 厦门","latitude":24.4798,"longitude":118.0894,"riskStart":"2026-11-03","riskEnd":"2026-12-03","isSimulation":true,"officialSourceUrl":null,"revision":1,"changeType":"New","changeLabel":"新增","riskLevel":"High","riskLabel":"高","previousRiskLevel":"None","confidence":0.95,"status":"Active","publishedAt":"2026-11-03T08:00:00+08:00","fingerprint":"SIM-XMN-WEATHER-NEW-V1","headline":"厦门沿海强风与暴雨风险 · 模拟新增","summary":"人为设定模拟风暴 WX-DEMO-01 可能影响厦门沿海交通与工业区正常作业。此为重复排练使用的虚构天气输入，不代表发生了真实台风或停工。"},"upgraded":{"externalKey":"SIM-XMN-TYPHOON-20261103","eventType":"Typhoon-Simulation","location":"中国 · 福建 · 厦门","latitude":24.4798,"longitude":118.0894,"riskStart":"2026-11-03","riskEnd":"2026-12-03","isSimulation":true,"officialSourceUrl":null,"revision":2,"changeType":"Upgraded","changeLabel":"升级","riskLevel":"Critical","riskLabel":"极高","previousRiskLevel":"High","confidence":0.96,"status":"Active","publishedAt":"2026-11-03T09:00:00+08:00","fingerprint":"SIM-XMN-WEATHER-UPGRADED-V2","headline":"厦门沿海天气风险升级 · 模拟升级","summary":"在虚构情景中，强风与暴雨影响范围扩大，模拟风险由高升级为极高。实际供应链影响仍须读取业务记录并向供应商确认。"},"downgraded":{"externalKey":"SIM-XMN-TYPHOON-20261103","eventType":"Typhoon-Simulation","location":"中国 · 福建 · 厦门","latitude":24.4798,"longitude":118.0894,"riskStart":"2026-11-03","riskEnd":"2026-12-03","isSimulation":true,"officialSourceUrl":null,"revision":3,"changeType":"Downgraded","changeLabel":"降级","riskLevel":"Medium","riskLabel":"中","previousRiskLevel":"Critical","confidence":0.93,"status":"Active","publishedAt":"2026-11-03T10:00:00+08:00","fingerprint":"SIM-XMN-WEATHER-DOWNGRADED-V3","headline":"厦门沿海天气影响减弱 · 模拟降级","summary":"在虚构情景中，天气影响减弱，模拟风险由极高降为中等。天气降级不意味着采购交期或生产计划已自动恢复。"},"resolved":{"externalKey":"SIM-XMN-TYPHOON-20261103","eventType":"Typhoon-Simulation","location":"中国 · 福建 · 厦门","latitude":24.4798,"longitude":118.0894,"riskStart":"2026-11-03","riskEnd":"2026-11-03","isSimulation":true,"officialSourceUrl":null,"revision":4,"changeType":"Resolved","changeLabel":"解除","riskLevel":"None","riskLabel":"无","previousRiskLevel":"Medium","confidence":0.98,"status":"Resolved","publishedAt":"2026-11-03T11:00:00+08:00","fingerprint":"SIM-XMN-WEATHER-RESOLVED-V4","headline":"厦门沿海天气风险解除 · 模拟解除","summary":"在虚构情景中，天气风险解除。解除只适用于本天气事件，不能据此自动恢复订单交期、增加库存或批准采购；仍须业务确认。"}}}</script>
+  <script>
+    const {publishedScenario, states} = JSON.parse(document.getElementById('demo-fixtures').textContent);
+    function showScenario(key) {
+      const event = states[key];
+      if (!event) throw new Error('Unknown preview scenario');
+      const view = {...event, confidencePercent: Math.round(event.confidence * 100) + '%',
+        publishedDisplay: event.publishedAt.slice(0,10) + ' ' + event.publishedAt.slice(11,16) + ' 北京时间',
+        publishedUtc: new Date(event.publishedAt).toISOString()};
+      document.querySelectorAll('[data-weather]').forEach(node => {node.textContent = view[node.dataset.weather];});
+      document.querySelector('time').dateTime = event.publishedAt;
+      document.getElementById('risk-pill').dataset.level = event.riskLevel;
+      document.getElementById('current-event').dataset.revision = event.revision;
+      document.getElementById('preview-note').hidden = key === publishedScenario;
+      document.getElementById('publish-command').textContent = 'node publish.mjs ' + key;
+      document.querySelectorAll('[data-scenario]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.scenario === key)));
+    }
+    document.querySelectorAll('[data-scenario]').forEach(button => button.addEventListener('click', () => showScenario(button.dataset.scenario)));
+    document.getElementById('reset-preview').addEventListener('click', () => showScenario(publishedScenario));
+    showScenario(publishedScenario);
+    if (location.protocol === 'file:') {
+      document.getElementById('feed-status').textContent = '本机文件预览，不是可供 Cowork 云端访问的源。请用静态托管的 HTTPS 地址。';
+    }
+  </script>
+</body>
+</html>

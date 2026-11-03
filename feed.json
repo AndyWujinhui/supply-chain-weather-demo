@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1.0",
+  "publisher": "Weather Signal Lab / DEMO",
+  "isSimulation": true,
+  "timestampBasis": "Fictional scenario clock; not real-time weather",
+  "confidenceBasis": "Simulated fixture confidence; not a verified weather forecast",
+  "sourcePath": "./index.html#current-event",
+  "currentEvent": {
+    "externalKey": "SIM-XMN-TYPHOON-20261103",
+    "eventType": "Typhoon-Simulation",
+    "location": "中国 · 福建 · 厦门",
+    "latitude": 24.4798,
+    "longitude": 118.0894,
+    "riskStart": "2026-11-03",
+    "riskEnd": "2026-12-03",
+    "isSimulation": true,
+    "officialSourceUrl": null,
+    "revision": 1,
+    "changeType": "New",
+    "changeLabel": "新增",
+    "riskLevel": "High",
+    "riskLabel": "高",
+    "previousRiskLevel": "None",
+    "confidence": 0.95,
+    "status": "Active",
+    "publishedAt": "2026-11-03T08:00:00+08:00",
+    "fingerprint": "SIM-XMN-WEATHER-NEW-V1",
+    "headline": "厦门沿海强风与暴雨风险 · 模拟新增",
+    "summary": "人为设定模拟风暴 WX-DEMO-01 可能影响厦门沿海交通与工业区正常作业。此为重复排练使用的虚构天气输入，不代表发生了真实台风或停工。"
+  }
+}
