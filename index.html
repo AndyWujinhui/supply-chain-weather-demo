@@ -53,28 +53,29 @@
   <header class="top">
     <div class="bar">
       <div class="brand"><span class="mark" aria-hidden="true">W</span><div><strong>Weather Signal Lab</strong><small>SUPPLY CHAIN RISK / DEMO SOURCE</small></div></div>
-      <div><a href="feed.json">当前源数据 JSON</a> &nbsp; <span class="demo-chip">SIMULATION ONLY</span></div>
+      <div><a href="#current-event">当前天气公告</a> &nbsp; <span class="demo-chip">模拟演示</span></div>
     </div>
   </header>
   <aside class="notice" aria-label="模拟免责声明"><div><strong>仅供演示 · 非官方预警</strong>　全部天气事件、情景时间与可信度均为人为设定。请勿据此作出安全、出行或真实业务决策。</div></aside>
   <main id="main">
     <section class="intro">
-      <div><div class="eyebrow">Weather intelligence / Scenario clock</div><h1>让天气风险，成为可追溯的输入。</h1><p class="muted">用于 Cowork 读取、地点匹配及风险变化识别的静态模拟源。<br>本站不保存供应商、物料、采购单、库存或客户数据，业务记录仍统一位于 Dataverse。</p></div>
+      <div><div class="eyebrow">Coastal weather / Scenario clock</div><h1>关注沿海天气，提前应对风险。</h1><p class="muted">观察厦门沿海风雨变化，关注港口、道路与运输动态。<br>及时确认受影响区域，做好应急准备。</p></div>
       <div class="published">当前已发布　<b>新增 · v1</b><br><span class="muted">情景时钟，不是实时天气</span></div>
     </section>
-    <p id="preview-note" class="preview-note" role="status" hidden><strong>正在本地预览另一版本。</strong> 此操作没有发布源变化；Cowork 及 feed.json 仍读取页顶所示的当前发布版本。真正切换源须在演示主机运行发布命令。</p>
+    <p id="preview-note" class="preview-note" role="status" hidden><strong>正在预览另一情景。</strong> 此操作没有改变已发布公告；页顶仍显示当前发布版本。</p>
     <div class="grid">
       <article class="card pad" id="current-event" data-external-key="SIM-XMN-TYPHOON-20261103" data-revision="1">
         <div class="alert-top"><div class="signal"><span class="dot"></span>模拟天气公告 / 一条当前事件</div><span id="risk-pill" class="risk" data-level="High">模拟风险：<span data-weather="riskLabel">高</span></span></div>
         <h2 class="alert-title" data-weather="headline">厦门沿海强风与暴雨风险 · 模拟新增</h2>
-        <p class="muted mono">事件 ID：SIM-XMN-TYPHOON-20261103<br>发布者：Weather Signal Lab / DEMO</p>
+        <p class="muted mono" hidden>事件 ID：SIM-XMN-TYPHOON-20261103<br>发布者：Weather Signal Lab / DEMO</p>
+        <p class="muted" style="font-size:12px"><time data-weather="publishedDisplay" datetime="2026-11-03T08:00:00+08:00">2026-11-03 08:00 北京时间</time> · 情景时间</p>
         <p class="summary" data-weather="summary">人为设定模拟风暴 WX-DEMO-01 可能影响厦门沿海交通与工业区正常作业。此为重复排练使用的虚构天气输入，不代表发生了真实台风或停工。</p>
         <div class="metrics">
           <div class="metric"><small>影响地点</small><strong>厦门</strong><span>福建 · 沿海地区</span></div>
           <div class="metric"><small>变化类型</small><strong data-weather="changeLabel">新增</strong><span>同一事件的版本变化</span></div>
           <div class="metric"><small>模拟可信度</small><strong data-weather="confidencePercent">95%</strong><span>非实测预测可信度</span></div>
         </div>
-        <table aria-label="当前天气事件结构化字段">
+        <table aria-label="当前天气事件结构化字段" hidden>
           <caption>可读取的当前源字段 · HTML 无须执行 JavaScript</caption>
           <thead><tr><th scope="col">字段</th><th scope="col">当前发布值</th></tr></thead>
           <tbody>
@@ -94,7 +95,7 @@
       </article>
       <aside class="side">
         <section class="card pad" aria-label="地点示意">
-          <div class="eyebrow">Location match</div><h2>厦门 · 福建沿海</h2><p class="muted" style="font-size:12px">用城市名称及坐标匹配业务地点；不是实际工厂位置。</p>
+          <div class="eyebrow">Affected region</div><h2>厦门 · 福建沿海</h2><p class="muted" style="font-size:12px">关注沿海地区风雨及交通运输变化。</p>
           <div class="map">
             <svg viewBox="0 0 340 185" role="img" aria-label="厦门位置的抽象沿海示意，不是地理地图">
               <defs><pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M25 0H0V25" fill="none" stroke="#bddce0" stroke-width=".7"/></pattern></defs>
@@ -108,27 +109,26 @@
           <div class="coordinates"><span>北纬 24.4798°</span><span>东经 118.0894°</span></div>
         </section>
         <section class="card pad">
-          <div class="eyebrow">Native Cowork hand-off</div><h2>源头只提供天气信号。</h2>
-          <div class="step"><b>1</b><div><strong>读取已发布 HTML / JSON</strong><span>确认模拟标记、发布时间、地点及当前版本。</span></div></div>
-          <div class="step"><b>2</b><div><strong>识别变化，而非重复报警</strong><span>按事件 ID 比较发布时间、版本与指纹；相同或更旧版本不产生新风险。</span></div></div>
-          <div class="step"><b>3</b><div><strong>业务分析与审批留在 Dataverse</strong><span>由原生插件读写。天气解除也不能自动恢复交期、发料或批准采购。</span></div></div>
-          <a class="source-link" href="feed.json">打开当前已发布的源 JSON ↗</a>
-          <p id="feed-status" class="file-note muted" role="status">静态源：一条当前事件；无需 JavaScript 即可读取。</p>
+          <div class="eyebrow">Weather watch</div><h2>重点关注</h2>
+          <div class="step"><b>1</b><div><strong>沿海风雨</strong><span>关注台风路径及受影响区域的变化。</span></div></div>
+          <div class="step"><b>2</b><div><strong>港口与运输</strong><span>留意港口作业、道路通行与运输安排。</span></div></div>
+          <div class="step"><b>3</b><div><strong>持续跟踪</strong><span>风险降级或解除后，仍需确认实际恢复情况。</span></div></div>
+          <p id="feed-status" class="file-note muted" role="status" hidden>静态源：一条当前事件；无需 JavaScript 即可读取。</p>
         </section>
       </aside>
     </div>
     <section class="card pad lab" aria-label="排练版本预览">
-      <div class="lab-head"><div><div class="eyebrow">Rehearsal lab</div><h2>四种变化，同一个事件。</h2></div><p>下列按钮<strong>仅改变本浏览器预览</strong>，不会改变对外发布的文件。要让 Cowork 读到新版本，必须重新发布 index.html 与 feed.json 两个静态文件。</p></div>
+      <div class="lab-head"><div><div class="eyebrow">Scenario preview</div><h2>四种变化，同一个事件。</h2></div><p>下列按钮<strong>仅改变本浏览器预览</strong>，不会改变已发布公告。</p></div>
       <div class="scenarios">
         <button class="scenario" data-scenario="new" aria-pressed="false"><span class="n">01 / NEW</span><strong>新增</strong><small>无 → 高 · v1</small></button>
         <button class="scenario" data-scenario="upgraded" aria-pressed="false"><span class="n">02 / UPGRADED</span><strong>升级</strong><small>高 → 极高 · v2</small></button>
         <button class="scenario" data-scenario="downgraded" aria-pressed="false"><span class="n">03 / DOWNGRADED</span><strong>降级</strong><small>极高 → 中 · v3</small></button>
         <button class="scenario" data-scenario="resolved" aria-pressed="false"><span class="n">04 / RESOLVED</span><strong>解除</strong><small>中 → 无 · v4</small></button>
       </div>
-      <div class="lab-footer"><span>真正发布：<code class="mono" id="publish-command">node publish.mjs new</code><br>命令仅在演示主机执行；发布后需部署两个文件并重新读取源。</span><button id="reset-preview" class="reset">返回已发布版本</button></div>
-      <noscript><p class="file-note">本浏览器未启用 JavaScript，预览按钮不可用；当前已发布天气正文和 JSON 仍可正常读取。</p></noscript>
+      <div class="lab-footer"><span hidden>真正发布：<code class="mono" id="publish-command">node publish.mjs new</code></span><button id="reset-preview" class="reset">返回已发布版本</button></div>
+      <noscript><p class="file-note">本浏览器未启用 JavaScript，预览按钮不可用；当前已发布公告仍可查看。</p></noscript>
     </section>
-    <footer class="foot"><div>WEATHER SIGNAL LAB · DEMO<br>独立的模拟天气源例外；不是 Cowork 原生托管服务。没有业务数据库或自定义后台。</div><div>真实源参考（不是本公告的证据）<br><a href="https://www.nmc.cn/" rel="noreferrer">中央气象台</a><a href="https://www.gdacs.org/" rel="noreferrer">GDACS</a><a href="https://portwatch.imf.org/" rel="noreferrer">IMF PortWatch</a></div></footer>
+    <footer class="foot"><div>WEATHER SIGNAL LAB · DEMO<br>全部情景均为虚构，非官方预警。</div><div>真实源参考（不是本公告的证据）<br><a href="https://www.nmc.cn/" rel="noreferrer">中央气象台</a><a href="https://www.gdacs.org/" rel="noreferrer">GDACS</a><a href="https://portwatch.imf.org/" rel="noreferrer">IMF PortWatch</a></div></footer>
   </main>
   <script id="demo-fixtures" type="application/json">{"publishedScenario":"new","states":{"new":{"externalKey":"SIM-XMN-TYPHOON-20261103","eventType":"Typhoon-Simulation","location":"中国 · 福建 · 厦门","latitude":24.4798,"longitude":118.0894,"riskStart":"2026-11-03","riskEnd":"2026-12-03","isSimulation":true,"officialSourceUrl":null,"revision":1,"changeType":"New","changeLabel":"新增","riskLevel":"High","riskLabel":"高","previousRiskLevel":"None","confidence":0.95,"status":"Active","publishedAt":"2026-11-03T08:00:00+08:00","fingerprint":"SIM-XMN-WEATHER-NEW-V1","headline":"厦门沿海强风与暴雨风险 · 模拟新增","summary":"人为设定模拟风暴 WX-DEMO-01 可能影响厦门沿海交通与工业区正常作业。此为重复排练使用的虚构天气输入，不代表发生了真实台风或停工。"},"upgraded":{"externalKey":"SIM-XMN-TYPHOON-20261103","eventType":"Typhoon-Simulation","location":"中国 · 福建 · 厦门","latitude":24.4798,"longitude":118.0894,"riskStart":"2026-11-03","riskEnd":"2026-12-03","isSimulation":true,"officialSourceUrl":null,"revision":2,"changeType":"Upgraded","changeLabel":"升级","riskLevel":"Critical","riskLabel":"极高","previousRiskLevel":"High","confidence":0.96,"status":"Active","publishedAt":"2026-11-03T09:00:00+08:00","fingerprint":"SIM-XMN-WEATHER-UPGRADED-V2","headline":"厦门沿海天气风险升级 · 模拟升级","summary":"在虚构情景中，强风与暴雨影响范围扩大，模拟风险由高升级为极高。实际供应链影响仍须读取业务记录并向供应商确认。"},"downgraded":{"externalKey":"SIM-XMN-TYPHOON-20261103","eventType":"Typhoon-Simulation","location":"中国 · 福建 · 厦门","latitude":24.4798,"longitude":118.0894,"riskStart":"2026-11-03","riskEnd":"2026-12-03","isSimulation":true,"officialSourceUrl":null,"revision":3,"changeType":"Downgraded","changeLabel":"降级","riskLevel":"Medium","riskLabel":"中","previousRiskLevel":"Critical","confidence":0.93,"status":"Active","publishedAt":"2026-11-03T10:00:00+08:00","fingerprint":"SIM-XMN-WEATHER-DOWNGRADED-V3","headline":"厦门沿海天气影响减弱 · 模拟降级","summary":"在虚构情景中，天气影响减弱，模拟风险由极高降为中等。天气降级不意味着采购交期或生产计划已自动恢复。"},"resolved":{"externalKey":"SIM-XMN-TYPHOON-20261103","eventType":"Typhoon-Simulation","location":"中国 · 福建 · 厦门","latitude":24.4798,"longitude":118.0894,"riskStart":"2026-11-03","riskEnd":"2026-11-03","isSimulation":true,"officialSourceUrl":null,"revision":4,"changeType":"Resolved","changeLabel":"解除","riskLevel":"None","riskLabel":"无","previousRiskLevel":"Medium","confidence":0.98,"status":"Resolved","publishedAt":"2026-11-03T11:00:00+08:00","fingerprint":"SIM-XMN-WEATHER-RESOLVED-V4","headline":"厦门沿海天气风险解除 · 模拟解除","summary":"在虚构情景中，天气风险解除。解除只适用于本天气事件，不能据此自动恢复订单交期、增加库存或批准采购；仍须业务确认。"}}}</script>
   <script>
@@ -140,7 +140,7 @@
         publishedDisplay: event.publishedAt.slice(0,10) + ' ' + event.publishedAt.slice(11,16) + ' 北京时间',
         publishedUtc: new Date(event.publishedAt).toISOString()};
       document.querySelectorAll('[data-weather]').forEach(node => {node.textContent = view[node.dataset.weather];});
-      document.querySelector('time').dateTime = event.publishedAt;
+      document.querySelectorAll('time').forEach(node => {node.dateTime = event.publishedAt;});
       document.getElementById('risk-pill').dataset.level = event.riskLevel;
       document.getElementById('current-event').dataset.revision = event.revision;
       document.getElementById('preview-note').hidden = key === publishedScenario;
