@@ -46,6 +46,17 @@
     @media(max-width:850px){.grid{grid-template-columns:1fr}.intro{align-items:flex-start;flex-direction:column}.side{display:grid;grid-template-columns:1fr 1fr;gap:20px}.side .card+.card{margin-top:0}.foot{flex-direction:column;gap:10px}.foot a{margin:0 14px 0 0}}
     @media(max-width:560px){.bar{padding:17px 18px}.top a{display:none}.notice div{padding:12px 18px}main{padding:26px 18px}.pad{padding:20px}.side{display:block}.side .card+.card{margin-top:20px}.scenarios{grid-template-columns:1fr 1fr}.lab-head{display:block}.lab-footer{align-items:flex-start;flex-direction:column}.metric strong{font-size:18px}.alert-title{font-size:21px}th{width:31%}.demo-chip{font-size:10px}}
     @media(prefers-reduced-motion:no-preference){button{transition:background .15s,border-color .15s}}
+    .weather-studio{margin:0 0 25px;background:#0b1c2a;color:#e3eef6;border:1px solid #26465a;border-radius:16px;overflow:hidden}
+    .studio-toolbar,.studio-timeline{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 20px;background:#102839}
+    .studio-toolbar h2{font-size:17px;margin:0}.studio-toolbar small{color:#9db6c6}.studio-controls{display:flex;gap:7px;flex-wrap:wrap}
+    .studio-controls button,.studio-timeline button{border:1px solid #416176;border-radius:6px;color:#dfeef8;background:#18384b;padding:6px 12px;font-size:12px}
+    .studio-controls button[aria-pressed="true"]{background:#087e9a;border-color:#24c4dc;color:white}
+    .studio-panes{display:grid;grid-template-columns:2.7fr 1fr;gap:1px;background:#26465a}
+    .studio-main,.studio-secondary{min-width:0;background:#0a1c2c;position:relative}.studio-main canvas,.studio-secondary canvas{display:block;width:100%;height:auto}
+    .studio-secondary{display:flex;flex-direction:column;justify-content:center}.studio-secondary p{padding:0 16px;font-size:12px;color:#a6c1d1}
+    .map-label{position:absolute;top:14px;left:16px;padding:4px 8px;background:#071620d9;border:1px solid #385366;border-radius:5px;font-size:11px;pointer-events:none}
+    .map-label b{color:#71dfef;margin-right:8px}.studio-timeline input{flex:1;min-width:80px;accent-color:#36c9df}.studio-timeline time{min-width:116px;font-size:12px;color:#b8d2df}.studio-disclaimer{padding:8px 20px;margin:0;font-size:11px;color:#aac0cd}
+    @media(max-width:850px){.studio-panes{grid-template-columns:1fr}.studio-secondary{display:none}.studio-toolbar{align-items:flex-start;flex-direction:column}}
   </style>
 </head>
 <body>
@@ -63,6 +74,15 @@
       <div class="published">当前已发布　<b>新增 · v1</b><br><span class="muted">情景时钟，不是实时天气</span></div>
     </section>
     <p id="preview-note" class="preview-note" role="status" hidden><strong>正在预览另一情景。</strong> 此操作没有改变已发布公告；页顶仍显示当前发布版本。</p>
+    <section class="weather-studio" aria-label="动态合成天气云图">
+      <div class="studio-toolbar"><div><h2>沿海天气影像</h2><small>COASTAL WEATHER IMAGERY · SYNTHETIC SCENARIO</small></div><div class="studio-controls"><button data-map-mode="infrared" aria-pressed="true">红外云图</button><button data-map-mode="radar" aria-pressed="false">降雨回波</button><button id="weather-language" aria-label="Switch weather map language">EN / 中</button></div></div>
+      <div class="studio-panes">
+        <div class="studio-main"><div class="map-label"><b id="weather-layer-label">IR · 红外云图</b><span>合成影像 / SIMULATION</span></div><canvas id="weather-cloud-map" width="900" height="470" role="img" aria-label="动态合成红外云图，包含厦门位置、模拟台风云系和情景路径"></canvas></div>
+        <div class="studio-secondary"><div class="map-label">RADAR · 合成回波</div><canvas id="weather-radar-map" width="340" height="310" role="img" aria-label="动态合成降雨回波图"></canvas><p id="weather-map-explanation">观察云系移动、强回波与沿海风险区域。影像仅为同一虚构事件的动态表达，不是卫星或雷达实测数据。</p></div>
+      </div>
+      <div class="studio-timeline"><button id="weather-play" aria-pressed="true">暂停回放</button><input id="weather-frame" type="range" min="0" max="35" value="0" aria-label="天气影像情景时间轴"><time id="weather-frame-time">情景 08:00</time></div>
+      <p class="studio-disclaimer">合成云图、降雨回波和示意路径均非官方观测或预报；时间轴回放不改变已发布风险公告。</p><p id="weather-visual-error" class="error" role="alert" hidden></p>
+    </section>
     <div class="grid">
       <article class="card pad" id="current-event" data-external-key="SIM-XMN-TYPHOON-20261103" data-revision="1">
         <div class="alert-top"><div class="signal"><span class="dot"></span>模拟天气公告 / 一条当前事件</div><span id="risk-pill" class="risk" data-level="High">模拟风险：<span data-weather="riskLabel">高</span></span></div>
@@ -146,6 +166,7 @@
       document.getElementById('preview-note').hidden = key === publishedScenario;
       document.getElementById('publish-command').textContent = 'node publish.mjs ' + key;
       document.querySelectorAll('[data-scenario]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.scenario === key)));
+      document.dispatchEvent(new CustomEvent('weather-scenario-change', {detail: {riskLevel: event.riskLevel}}));
     }
     document.querySelectorAll('[data-scenario]').forEach(button => button.addEventListener('click', () => showScenario(button.dataset.scenario)));
     document.getElementById('reset-preview').addEventListener('click', () => showScenario(publishedScenario));
@@ -153,6 +174,15 @@
     if (location.protocol === 'file:') {
       document.getElementById('feed-status').textContent = '本机文件预览，不是可供 Cowork 云端访问的源。请用静态托管的 HTTPS 地址。';
     }
+  </script>
+  <script type="module">
+    import('./weather-visuals.mjs?v=20261103-clouds').catch(error => {
+      const notice = document.getElementById('weather-visual-error');
+      notice.hidden = false;
+      notice.textContent = `天气影像未就绪：${error.message}`;
+      document.querySelectorAll('[data-map-mode],#weather-play,#weather-frame,#weather-language').forEach(control => { control.disabled = true; });
+      console.error('Weather imagery module could not load', error);
+    });
   </script>
 </body>
 </html>
