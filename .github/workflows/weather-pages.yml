@@ -32,7 +32,7 @@ jobs:
               raise ValueError("Missing or invalid protected IndexNow key")
           destination = pathlib.Path("_site")
           destination.mkdir()
-          for name in ("index.html", "feed.json", "weather-visuals.mjs"):
+          for name in ("index.html", "weather.html", "feed.json", "sitemap.xml", "weather-visuals.mjs"):
               shutil.copyfile(name, destination / name)
           (destination / (key + ".txt")).write_text(key, encoding="utf-8")
           PY
@@ -62,7 +62,8 @@ jobs:
           root = "https://andywujinhui.github.io/supply-chain-weather-demo/"
           payload = {"host": "andywujinhui.github.io", "key": key,
                      "keyLocation": root + key + ".txt",
-                     "urlList": [root, root + "index.html", root + "feed.json"]}
+                     "urlList": [root, root + "index.html", root + "weather.html",
+                                 root + "feed.json", root + "sitemap.xml"]}
           request = urllib.request.Request(
               "https://www.bing.com/indexnow",
               data=json.dumps(payload).encode("utf-8"),
